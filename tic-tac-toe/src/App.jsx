@@ -57,14 +57,22 @@ function App() {
     return null;
   }
 
-  const emptyBoard = () => {
+
+  // Función para vaciar el tablero
+  const resetGame = () => {
     const emptyBoard = Array(9).fill(null);
     setBoard(emptyBoard)
     setWinner(null)
+    setTurn(TURNS.X)
   }
  
-  const updateBoard = (index) => {
 
+  // Comprobar si se ha acabado la partida
+  const checkEndGame = (newBoard) => {
+    return newBoard.every((square) => square !== null)
+  }
+
+  const updateBoard = (index) => {
     // Si ya existe el valor en esa celda no se permite escribir ahí.
     if (board[index] || winner) return;
 
@@ -79,15 +87,18 @@ function App() {
 
     // Revisar si hay un ganador actual.
     const newWinner = checkWinner(newBoard)
+
     if (newWinner) {
       setWinner(newWinner)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false)
     }
   }
-
-
+  
   return (
     <main className="board">
       <h1>Tic Tac Toe</h1>
+      <button onClick={resetGame}>Reiniciar juego</button>
       <section className="game">
         {
           board.map((cell,index) => {
@@ -113,9 +124,29 @@ function App() {
         </Square>
       </section>
 
-      <section className="turn">
-        <button style={{width : '100%'}} onClick={emptyBoard}>Vaciar Tablero</button>
-      </section>
+      {
+        winner !== null && (
+          <section className="winner">
+            <div className="text">
+              <h2>
+                {
+                winner == false
+                  ? 'Empate' 
+                  : 'Ganador'
+                }
+              </h2>
+
+              <header className="win">
+                {winner && <Square>{winner}</Square>}
+              </header>
+
+              <footer>
+                <button onClick={resetGame}>Reiniciar juego</button>
+              </footer>
+            </div>
+          </section>
+        )
+      }
     </main>
   )
 }
